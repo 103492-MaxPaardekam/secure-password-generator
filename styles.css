@@ -1,7 +1,50 @@
 /* styles.css — Keysmith
  * Apple-like design: minimal, clean, soft depth, excellent typography
  * System font stack, light/dark mode, reduced motion support
+ * Premium micro-interactions and animations
  */
+
+/* ========================================================================
+   MOTION TOKENS — Apple-like Animation System
+   ======================================================================== */
+:root {
+  /* Durations — Short for micro-interactions, longer for larger transitions */
+  --dur-1: 120ms; /* Quick micro-interactions: button press, toggle snap */
+  --dur-2: 180ms; /* Standard interactions: hover states, small reveals */
+  --dur-3: 280ms; /* Larger transitions: panel switches, strength meter */
+  --dur-4: 400ms; /* Complex animations: toast, sheen effects */
+
+  /* Easing Curves — Apple-like, smooth and natural */
+  --ease-out: cubic-bezier(
+    0.2,
+    0.8,
+    0.2,
+    1
+  ); /* Primary ease-out for most animations */
+  --ease-out-back: cubic-bezier(
+    0.34,
+    1.56,
+    0.64,
+    1
+  ); /* Slight overshoot for playful elements */
+  --ease-in-out: cubic-bezier(
+    0.4,
+    0,
+    0.2,
+    1
+  ); /* Symmetric for reversible animations */
+  --ease-spring: cubic-bezier(
+    0.175,
+    0.885,
+    0.32,
+    1.1
+  ); /* Springy for toggles */
+
+  /* Shadow transitions for depth changes */
+  --shadow-press: 0 1px 1px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-focus-ring: 0 0 0 4px var(--color-accent-soft);
+}
 
 /* ========================================================================
    CSS Custom Properties (Design Tokens)
@@ -93,7 +136,7 @@
 }
 
 /* ========================================================================
-   Reduced Motion
+   Reduced Motion — Respect user preferences
    ======================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -102,6 +145,22 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific animations that could cause discomfort */
+  .output-sheen,
+  .shake,
+  .output-container.tap-active,
+  .btn-regenerate.press-active {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Keep essential state changes instant but visible */
+  .toast {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -193,7 +252,7 @@ body {
 }
 
 /* ========================================================================
-   Mode Toggle
+   Mode Toggle — Animated tab switch
    ======================================================================== */
 .mode-toggle {
   display: flex;
@@ -215,13 +274,19 @@ body {
   color: var(--color-text-secondary);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--transition-fast);
+  transition:
+    color var(--dur-2) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
   position: relative;
   z-index: 1;
 }
 
 .mode-btn:hover {
   color: var(--color-text-primary);
+}
+
+.mode-btn:active {
+  transform: scale(0.98);
 }
 
 .mode-btn.active {
@@ -242,7 +307,8 @@ body {
   background: var(--color-surface);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-normal);
+  transition: transform var(--dur-3) var(--ease-out);
+  will-change: transform;
 }
 
 .mode-toggle[data-mode="passphrase"] .mode-indicator {

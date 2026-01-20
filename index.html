@@ -60,6 +60,7 @@
             aria-label="Generated password. Click to copy."
             id="output-container"
           >
+            <div class="output-sheen" aria-hidden="true"></div>
             <output id="output" class="output" aria-live="polite"></output>
             <span class="copy-hint">Click to copy</span>
             <span class="copied-feedback" aria-hidden="true">Copied!</span>
@@ -88,6 +89,15 @@
           </div>
         </div>
 
+        <!-- Toast notification -->
+        <div
+          id="toast"
+          class="toast"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        ></div>
+
         <!-- Live region for screen reader announcements -->
         <div
           id="live-region"
@@ -105,194 +115,198 @@
           hidden
         ></div>
 
-        <!-- Password Controls -->
-        <div
-          role="tabpanel"
-          id="panel-password"
-          aria-labelledby="tab-password"
-          class="controls-panel"
-        >
-          <fieldset class="control-group">
-            <legend>Length</legend>
-            <div class="slider-group">
-              <input
-                type="range"
-                id="password-length-slider"
-                min="8"
-                max="128"
-                value="16"
-                aria-label="Password length slider"
-              />
-              <input
-                type="number"
-                id="password-length-input"
-                min="8"
-                max="128"
-                value="16"
-                aria-label="Password length"
-                class="length-input"
-              />
-            </div>
-          </fieldset>
-
-          <fieldset class="control-group">
-            <legend>Character Types</legend>
-            <div class="toggle-grid">
-              <label class="toggle-item">
-                <input type="checkbox" id="opt-lowercase" checked />
-                <span class="toggle-switch"></span>
-                <span class="toggle-label">Lowercase (a-z)</span>
-              </label>
-              <label class="toggle-item">
-                <input type="checkbox" id="opt-uppercase" checked />
-                <span class="toggle-switch"></span>
-                <span class="toggle-label">Uppercase (A-Z)</span>
-              </label>
-              <label class="toggle-item">
-                <input type="checkbox" id="opt-digits" checked />
-                <span class="toggle-switch"></span>
-                <span class="toggle-label">Digits (0-9)</span>
-              </label>
-              <label class="toggle-item">
-                <input type="checkbox" id="opt-symbols" />
-                <span class="toggle-switch"></span>
-                <span class="toggle-label">Symbols</span>
-              </label>
-            </div>
-          </fieldset>
-
-          <fieldset
-            class="control-group symbols-config"
-            id="symbols-config"
-            hidden
+        <!-- Panels wrapper for smooth transitions -->
+        <div class="panels-wrapper">
+          <!-- Password Controls -->
+          <div
+            role="tabpanel"
+            id="panel-password"
+            aria-labelledby="tab-password"
+            class="controls-panel"
           >
-            <legend>Allowed Symbols</legend>
-            <input
-              type="text"
-              id="symbols-input"
-              class="text-input"
-              value="!@#$%^&*()-_=+[]{};:,.<>?"
-              aria-describedby="symbols-help"
-            />
-            <small id="symbols-help" class="help-text"
-              >Tip: remove characters you don't want included.</small
+            <fieldset class="control-group">
+              <legend>Length</legend>
+              <div class="slider-group">
+                <input
+                  type="range"
+                  id="password-length-slider"
+                  min="8"
+                  max="128"
+                  value="16"
+                  aria-label="Password length slider"
+                />
+                <input
+                  type="number"
+                  id="password-length-input"
+                  min="8"
+                  max="128"
+                  value="16"
+                  aria-label="Password length"
+                  class="length-input"
+                />
+              </div>
+            </fieldset>
+
+            <fieldset class="control-group">
+              <legend>Character Types</legend>
+              <div class="toggle-grid">
+                <label class="toggle-item">
+                  <input type="checkbox" id="opt-lowercase" checked />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label">Lowercase (a-z)</span>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="opt-uppercase" checked />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label">Uppercase (A-Z)</span>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="opt-digits" checked />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label">Digits (0-9)</span>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="opt-symbols" />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label">Symbols</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset
+              class="control-group symbols-config"
+              id="symbols-config"
+              hidden
             >
-          </fieldset>
-
-          <fieldset class="control-group">
-            <legend>Options</legend>
-            <label class="toggle-item">
-              <input type="checkbox" id="opt-ambiguous" checked />
-              <span class="toggle-switch"></span>
-              <span class="toggle-label">Avoid ambiguous characters</span>
-            </label>
-            <small class="help-text">Excludes: O, 0, I, l, 1, |, etc.</small>
-          </fieldset>
-        </div>
-
-        <!-- Passphrase Controls -->
-        <div
-          role="tabpanel"
-          id="panel-passphrase"
-          aria-labelledby="tab-passphrase"
-          class="controls-panel"
-          hidden
-        >
-          <fieldset class="control-group">
-            <legend>Number of Words</legend>
-            <div class="slider-group">
-              <input
-                type="range"
-                id="passphrase-words-slider"
-                min="3"
-                max="10"
-                value="4"
-                aria-label="Number of words slider"
-              />
-              <input
-                type="number"
-                id="passphrase-words-input"
-                min="3"
-                max="10"
-                value="4"
-                aria-label="Number of words"
-                class="length-input"
-              />
-            </div>
-          </fieldset>
-
-          <fieldset class="control-group">
-            <legend>Separator</legend>
-            <div class="separator-controls">
-              <select
-                id="separator-select"
-                class="select-input"
-                aria-label="Word separator"
-              >
-                <option value="-" selected>Hyphen (-)</option>
-                <option value=" ">Space</option>
-                <option value="_">Underscore (_)</option>
-                <option value=".">Dot (.)</option>
-                <option value="custom">Custom...</option>
-              </select>
+              <legend>Allowed Symbols</legend>
               <input
                 type="text"
-                id="custom-separator"
-                class="text-input separator-input"
-                maxlength="3"
-                placeholder="e.g. ~"
-                aria-label="Custom separator"
-                hidden
+                id="symbols-input"
+                class="text-input"
+                value="!@#$%^&*()-_=+[]{};:,.<>?"
+                aria-describedby="symbols-help"
               />
-            </div>
-          </fieldset>
+              <small id="symbols-help" class="help-text"
+                >Tip: remove characters you don't want included.</small
+              >
+            </fieldset>
 
-          <fieldset class="control-group">
-            <legend>Capitalization</legend>
-            <select
-              id="capitalization-select"
-              class="select-input"
-              aria-label="Word capitalization"
-            >
-              <option value="lowercase" selected>lowercase</option>
-              <option value="capitalize">Capitalize Each Word</option>
-              <option value="random">rAnDoM cAsE</option>
-            </select>
-          </fieldset>
-
-          <fieldset class="control-group">
-            <legend>Optional Additions</legend>
-            <div class="toggle-grid">
+            <fieldset class="control-group">
+              <legend>Options</legend>
               <label class="toggle-item">
-                <input type="checkbox" id="opt-add-number" />
+                <input type="checkbox" id="opt-ambiguous" checked />
                 <span class="toggle-switch"></span>
-                <span class="toggle-label">Add a number (2-3 digits)</span>
+                <span class="toggle-label">Avoid ambiguous characters</span>
               </label>
-              <label class="toggle-item">
-                <input type="checkbox" id="opt-add-symbol" />
-                <span class="toggle-switch"></span>
-                <span class="toggle-label">Add a symbol</span>
-              </label>
-            </div>
-          </fieldset>
+              <small class="help-text">Excludes: O, 0, I, l, 1, |, etc.</small>
+            </fieldset>
+          </div>
 
-          <fieldset
-            class="control-group passphrase-symbols-config"
-            id="passphrase-symbols-config"
+          <!-- Passphrase Controls -->
+          <div
+            role="tabpanel"
+            id="panel-passphrase"
+            aria-labelledby="tab-passphrase"
+            class="controls-panel"
             hidden
+            aria-hidden="true"
           >
-            <legend>Symbol to Add From</legend>
-            <input
-              type="text"
-              id="passphrase-symbols-input"
-              class="text-input"
-              value="!@#$%^&*"
-              aria-describedby="passphrase-symbols-help"
-            />
-            <small id="passphrase-symbols-help" class="help-text"
-              >One random symbol from this set will be appended.</small
+            <fieldset class="control-group">
+              <legend>Number of Words</legend>
+              <div class="slider-group">
+                <input
+                  type="range"
+                  id="passphrase-words-slider"
+                  min="3"
+                  max="10"
+                  value="4"
+                  aria-label="Number of words slider"
+                />
+                <input
+                  type="number"
+                  id="passphrase-words-input"
+                  min="3"
+                  max="10"
+                  value="4"
+                  aria-label="Number of words"
+                  class="length-input"
+                />
+              </div>
+            </fieldset>
+
+            <fieldset class="control-group">
+              <legend>Separator</legend>
+              <div class="separator-controls">
+                <select
+                  id="separator-select"
+                  class="select-input"
+                  aria-label="Word separator"
+                >
+                  <option value="-" selected>Hyphen (-)</option>
+                  <option value=" ">Space</option>
+                  <option value="_">Underscore (_)</option>
+                  <option value=".">Dot (.)</option>
+                  <option value="custom">Custom...</option>
+                </select>
+                <input
+                  type="text"
+                  id="custom-separator"
+                  class="text-input separator-input"
+                  maxlength="3"
+                  placeholder="e.g. ~"
+                  aria-label="Custom separator"
+                  hidden
+                />
+              </div>
+            </fieldset>
+
+            <fieldset class="control-group">
+              <legend>Capitalization</legend>
+              <select
+                id="capitalization-select"
+                class="select-input"
+                aria-label="Word capitalization"
+              >
+                <option value="lowercase" selected>lowercase</option>
+                <option value="capitalize">Capitalize Each Word</option>
+                <option value="random">rAnDoM cAsE</option>
+              </select>
+            </fieldset>
+
+            <fieldset class="control-group">
+              <legend>Optional Additions</legend>
+              <div class="toggle-grid">
+                <label class="toggle-item">
+                  <input type="checkbox" id="opt-add-number" />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label">Add a number (2-3 digits)</span>
+                </label>
+                <label class="toggle-item">
+                  <input type="checkbox" id="opt-add-symbol" />
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label">Add a symbol</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset
+              class="control-group passphrase-symbols-config"
+              id="passphrase-symbols-config"
+              hidden
             >
-          </fieldset>
+              <legend>Symbol to Add From</legend>
+              <input
+                type="text"
+                id="passphrase-symbols-input"
+                class="text-input"
+                value="!@#$%^&*"
+                aria-describedby="passphrase-symbols-help"
+              />
+              <small id="passphrase-symbols-help" class="help-text"
+                >One random symbol from this set will be appended.</small
+              >
+            </fieldset>
+          </div>
         </div>
 
         <!-- Strength Panel -->
