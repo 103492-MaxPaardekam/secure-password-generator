@@ -3249,6 +3249,7 @@
       btnRegenerate: document.getElementById("btn-regenerate"),
       liveRegion: document.getElementById("live-region"),
       errorDisplay: document.getElementById("error-display"),
+      toast: document.getElementById("toast"),
 
       // Password controls
       passwordLengthSlider: document.getElementById("password-length-slider"),
@@ -3281,6 +3282,9 @@
       strengthLabel: document.getElementById("strength-label"),
       strengthBits: document.getElementById("strength-bits"),
     };
+
+    // Set initial aria-hidden for passphrase panel
+    elements.passphrasePanel.setAttribute("aria-hidden", "true");
 
     // Verify Web Crypto API is available
     if (
