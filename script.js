@@ -2949,18 +2949,7 @@
   // ========================================================================
 
   function init() {
-    // Verify Web Crypto API is available
-    if (
-      typeof crypto === "undefined" ||
-      typeof crypto.getRandomValues !== "function"
-    ) {
-      showError(
-        "Your browser does not support the Web Crypto API. Please use a modern browser.",
-      );
-      return;
-    }
-
-    // Initialize DOM element references
+    // Initialize DOM element references first
     elements = {
       // Mode toggle
       modeToggle: document.querySelector(".mode-toggle"),
@@ -3007,6 +2996,17 @@
       strengthLabel: document.getElementById("strength-label"),
       strengthBits: document.getElementById("strength-bits"),
     };
+
+    // Verify Web Crypto API is available
+    if (
+      typeof crypto === "undefined" ||
+      typeof crypto.getRandomValues !== "function"
+    ) {
+      showError(
+        "Your browser does not support the Web Crypto API. Please use a modern browser.",
+      );
+      return;
+    }
 
     initEventListeners();
 
