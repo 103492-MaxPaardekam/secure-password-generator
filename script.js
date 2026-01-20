@@ -2905,7 +2905,7 @@
   /**
    * Validates the current state and returns an error message if invalid.
    *
-   * @returns {string|null} Error message or null if valid
+   * @returns {Object} Object with message (string|null) and target (HTMLElement|null)
    */
   function validateState() {
     if (state.mode === "password") {
@@ -2914,18 +2914,27 @@
 
       // Check if at least one category is enabled
       if (!lowercase && !uppercase && !digits && !symbols) {
-        return "Please select at least one character type.";
+        return {
+          message: "Please select at least one character type.",
+          target: document.querySelector(".toggle-grid"),
+        };
       }
 
       // Check if symbols is enabled but symbolSet is empty
       if (symbols && (!symbolSet || symbolSet.trim().length === 0)) {
-        return "Please enter at least one symbol character.";
+        return {
+          message: "Please enter at least one symbol character.",
+          target: elements.symbolsInput,
+        };
       }
 
       // Check if password length can accommodate all selected categories
       const { categories } = buildPasswordCharset(state.password);
       if (state.password.length < categories.length) {
-        return `Password length must be at least ${categories.length} to include all selected character types.`;
+        return {
+          message: `Password length must be at least ${categories.length} to include all selected character types.`,
+          target: elements.passwordLengthInput,
+        };
       }
     } else {
       // Passphrase mode
@@ -2943,20 +2952,25 @@
         (!state.passphrase.symbolSet ||
           state.passphrase.symbolSet.trim().length === 0)
       ) {
-        return "Please enter at least one symbol character for the passphrase.";
+        return {
+          message:
+            "Please enter at least one symbol character for the passphrase.",
+          target: elements.passphraseSymbolsInput,
+        };
       }
     }
 
-    return null;
+    return { message: null, target: null };
   }
 
   /**
-   * Generates a new password or passphrase and updates the UI.
+   * Generates a new password or passphrase and updates the UI with animations.
+   * @param {boolean} isRegenerate - Whether this is a regenerate action (triggers extra animations)
    */
-  function generate() {
-    const error = validateState();
-    if (error) {
-      showError(error);
+  function generate(isRegenerate = false) {
+    const validation = validateState();
+    if (validation.message) {
+      showError(validation.message, validation.target);
       state.currentOutput = "";
       elements.output.textContent = "—";
       updateStrengthUI(0);
@@ -2966,15 +2980,24 @@
     showError(null);
 
     try {
+      let newOutput;
       if (state.mode === "password") {
-        state.currentOutput = generatePassword(state.password);
+        newOutput = generatePassword(state.password);
         elements.output.classList.remove("passphrase-output");
       } else {
-        state.currentOutput = generatePassphrase(state.passphrase);
+        newOutput = generatePassphrase(state.passphrase);
         elements.output.classList.add("passphrase-output");
       }
 
-      elements.output.textContent = state.currentOutput;
+      // Animate output change
+      if (isRegenerate && state.currentOutput) {
+        animateOutputChange(elements.output, newOutput, () => {
+          state.currentOutput = newOutput;
+        });
+      } else {
+        elements.output.textContent = newOutput;
+        state.currentOutput = newOutput;
+      }
 
       // Update strength
       const entropy = calculateEntropy(state);
