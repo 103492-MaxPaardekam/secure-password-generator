@@ -677,7 +677,7 @@ body {
 }
 
 /* ========================================================================
-   Slider Group
+   Slider Group — Animated thumb interactions
    ======================================================================== */
 .slider-group {
   display: flex;
@@ -706,13 +706,20 @@ body {
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition:
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast);
+    transform var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+  will-change: transform;
 }
 
 .slider-group input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.slider-group input[type="range"]::-webkit-slider-thumb:active {
   transform: scale(1.1);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.4);
 }
 
 .slider-group input[type="range"]::-moz-range-thumb {
@@ -723,6 +730,14 @@ body {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out);
+}
+
+.slider-group input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .slider-group input[type="range"]:focus-visible {
@@ -742,7 +757,10 @@ body {
   font-weight: 500;
   text-align: center;
   color: var(--color-text-primary);
-  transition: border-color var(--transition-fast);
+  transition: 
+    border-color var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
 }
 
 .length-input:hover {
@@ -752,11 +770,22 @@ body {
 .length-input:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  box-shadow: var(--shadow-focus-ring);
+}
+
+/* Value change pulse animation */
+.length-input.value-changed {
+  animation: value-pulse var(--dur-2) var(--ease-out);
+}
+
+@keyframes value-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
 /* ========================================================================
-   Toggle Grid
+   Toggle Grid — Animated switches
    ======================================================================== */
 .toggle-grid {
   display: flex;
@@ -786,7 +815,7 @@ body {
   background: var(--color-border);
   border-radius: var(--radius-full);
   flex-shrink: 0;
-  transition: background-color var(--transition-fast);
+  transition: background-color var(--dur-2) var(--ease-out);
 }
 
 .toggle-switch::after {
@@ -799,7 +828,8 @@ body {
   background: var(--color-surface);
   border-radius: 50%;
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast);
+  transition: transform var(--dur-2) var(--ease-spring);
+  will-change: transform;
 }
 
 .toggle-item input:checked + .toggle-switch {
@@ -810,18 +840,34 @@ body {
   transform: translateX(calc(var(--toggle-width) - var(--toggle-height)));
 }
 
+/* Subtle press effect on toggle */
+.toggle-item:active .toggle-switch::after {
+  transform: scaleX(1.1);
+}
+
+.toggle-item input:checked + .toggle-switch:active::after {
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-height))) scaleX(1.1);
+}
+
 .toggle-item input:focus-visible + .toggle-switch {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+  box-shadow: var(--shadow-focus-ring);
 }
 
 .toggle-label {
   font-size: 0.9375rem;
   color: var(--color-text-primary);
+  transition: color var(--dur-2) var(--ease-out);
+}
+
+/* Dim label when unchecked for visual feedback */
+.toggle-item input:not(:checked) ~ .toggle-label {
+  color: var(--color-text-secondary);
 }
 
 /* ========================================================================
-   Text Inputs & Selects
+   Text Inputs & Selects — Smooth focus states
    ======================================================================== */
 .text-input,
 .select-input {
@@ -835,8 +881,9 @@ body {
   font-size: 0.9375rem;
   color: var(--color-text-primary);
   transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+    border-color var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out);
 }
 
 .text-input:hover,
@@ -848,7 +895,19 @@ body {
 .select-input:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  box-shadow: var(--shadow-focus-ring);
+}
+
+/* Error state for inputs */
+.text-input.input-error,
+.select-input.input-error {
+  border-color: var(--color-error);
+  background: rgba(255, 59, 48, 0.05);
+}
+
+.text-input.input-error:focus,
+.select-input.input-error:focus {
+  box-shadow: 0 0 0 4px rgba(255, 59, 48, 0.15);
 }
 
 .text-input::placeholder {
@@ -904,7 +963,7 @@ body {
 }
 
 /* ========================================================================
-   Strength Panel
+   Strength Panel — Animated meter and labels
    ======================================================================== */
 .strength-panel {
   margin-top: var(--space-lg);
@@ -939,9 +998,11 @@ body {
   height: 100%;
   width: 0%;
   border-radius: var(--radius-full);
+  transform-origin: left center;
   transition:
-    width var(--transition-normal),
-    background-color var(--transition-normal);
+    width var(--dur-3) var(--ease-out),
+    background-color var(--dur-3) var(--ease-out);
+  will-change: width;
 }
 
 .strength-bar.weak {
@@ -975,6 +1036,7 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-primary);
+  transition: color var(--dur-3) var(--ease-out);
 }
 
 .strength-label.weak {
@@ -990,13 +1052,20 @@ body {
   color: var(--color-very-strong);
 }
 
+/* Crossfade animation for label text changes */
+.strength-label.label-updating {
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+
 .strength-bits {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
+  transition: color var(--dur-2) var(--ease-out);
 }
 
 /* ========================================================================
-   Strength Details (Collapsible)
+   Strength Details (Collapsible) — Smooth expand/collapse
    ======================================================================== */
 .strength-details {
   margin-top: var(--space-md);
@@ -1008,6 +1077,7 @@ body {
   cursor: pointer;
   user-select: none;
   list-style: none;
+  transition: color var(--dur-2) var(--ease-out);
 }
 
 .strength-details summary::-webkit-details-marker {
@@ -1017,7 +1087,7 @@ body {
 .strength-details summary::before {
   content: "▶ ";
   font-size: 0.625rem;
-  transition: transform var(--transition-fast);
+  transition: transform var(--dur-2) var(--ease-out);
   display: inline-block;
 }
 
@@ -1026,7 +1096,7 @@ body {
 }
 
 .strength-details summary:hover {
-  text-decoration: underline;
+  color: var(--color-accent-hover);
 }
 
 .strength-details summary:focus-visible {
@@ -1042,6 +1112,18 @@ body {
   font-size: 0.8125rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
+  animation: details-expand var(--dur-3) var(--ease-out);
+}
+
+@keyframes details-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .details-content p {
