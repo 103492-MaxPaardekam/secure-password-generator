@@ -2855,7 +2855,7 @@
   }
 
   /**
-   * Updates the strength panel UI.
+   * Updates the strength panel UI with animations.
    *
    * @param {number} entropyBits - Entropy in bits
    */
@@ -2865,26 +2865,37 @@
     // Update bar
     elements.strengthBar.className = "strength-bar " + className;
 
-    // Update label
-    elements.strengthLabel.textContent = label;
-    elements.strengthLabel.className = "strength-label " + className;
+    // Animate label change if different
+    if (previousStrength !== className) {
+      animateStrengthLabel(elements.strengthLabel, label, className);
+      previousStrength = className;
+    } else {
+      elements.strengthLabel.textContent = label;
+      elements.strengthLabel.className = "strength-label " + className;
+    }
 
     // Update bits display
     elements.strengthBits.textContent = entropyBits.toFixed(1) + " bits";
   }
 
   /**
-   * Shows or hides an error message.
+   * Shows or hides an error message with animation.
    *
    * @param {string|null} message - Error message or null to hide
+   * @param {HTMLElement} [shakeTarget] - Optional element to shake
    */
-  function showError(message) {
+  function showError(message, shakeTarget = null) {
     state.error = message;
 
     if (message) {
       elements.errorDisplay.textContent = message;
       elements.errorDisplay.hidden = false;
       elements.btnRegenerate.disabled = true;
+
+      // Shake the relevant control group if provided
+      if (shakeTarget) {
+        shake(shakeTarget);
+      }
     } else {
       elements.errorDisplay.hidden = true;
       elements.btnRegenerate.disabled = false;
