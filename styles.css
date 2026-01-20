@@ -1257,4 +1257,11 @@ body {
     justify-content: space-between;
     align-items: center;
   }
+
+  /* Toast positioning for mobile */
+  .toast {
+    bottom: var(--space-lg);
+    max-width: calc(100vw - var(--space-xl));
+    font-size: 0.8125rem;
+  }
 }
