@@ -1,9 +1,210 @@
 // script.js — Keysmith
 // Secure Password & Passphrase Generator
 // Uses Web Crypto API for all randomness. No Math.random(). No network. No storage.
+// Premium micro-interactions and animations included.
 
 (function () {
   "use strict";
+
+  // ========================================================================
+  // ANIMATION HELPERS — Motion system utilities
+  // ========================================================================
+
+  /**
+   * Check if user prefers reduced motion
+   * @returns {boolean}
+   */
+  function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  /**
+   * Play a press animation on an element
+   * @param {HTMLElement} el - Element to animate
+   */
+  function playPress(el) {
+    if (prefersReducedMotion()) return;
+    el.classList.add("press-active");
+    // Remove after animation completes
+    setTimeout(() => el.classList.remove("press-active"), 150);
+  }
+
+  /**
+   * Play a tap animation on an element (for output container)
+   * @param {HTMLElement} el - Element to animate
+   */
+  function playTap(el) {
+    if (prefersReducedMotion()) return;
+    el.classList.add("tap-active");
+    setTimeout(() => el.classList.remove("tap-active"), 120);
+  }
+
+  /**
+   * Show a toast notification
+   * @param {string} message - Message to display
+   * @param {string} type - Toast type ('success', 'error', or empty)
+   * @param {number} duration - How long to show (ms)
+   */
+  let toastTimeout = null;
+  function showToast(message, type = "", duration = 2000) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+
+    // Clear any existing timeout
+    if (toastTimeout) {
+      clearTimeout(toastTimeout);
+    }
+
+    // Remove existing classes
+    toast.classList.remove("toast-visible", "toast-success", "toast-error");
+
+    // Set content and type
+    toast.textContent = message;
+    if (type === "success") {
+      toast.classList.add("toast-success");
+    }
+
+    // Trigger reflow for animation reset
+    void toast.offsetWidth;
+
+    // Show toast
+    toast.classList.add("toast-visible");
+
+    // Hide after duration
+    toastTimeout = setTimeout(() => {
+      toast.classList.remove("toast-visible");
+    }, duration);
+  }
+
+  /**
+   * Shake an element to indicate an error
+   * @param {HTMLElement} el - Element to shake
+   */
+  function shake(el) {
+    if (prefersReducedMotion()) return;
+    el.classList.remove("shake");
+    void el.offsetWidth; // Trigger reflow
+    el.classList.add("shake");
+    setTimeout(() => el.classList.remove("shake"), 300);
+  }
+
+  /**
+   * Play a sheen effect across the output container
+   * @param {HTMLElement} container - Output container element
+   */
+  function playSheen(container) {
+    if (prefersReducedMotion()) return;
+    container.classList.remove("sheen-active");
+    void container.offsetWidth;
+    container.classList.add("sheen-active");
+    setTimeout(() => container.classList.remove("sheen-active"), 400);
+  }
+
+  /**
+   * Animate output text change with crossfade
+   * @param {HTMLElement} outputEl - The output element
+   * @param {string} newValue - New text value
+   * @param {Function} callback - Called after animation with new value applied
+   */
+  function animateOutputChange(outputEl, newValue, callback) {
+    if (prefersReducedMotion()) {
+      outputEl.textContent = newValue;
+      if (callback) callback();
+      return;
+    }
+
+    // Crossfade out
+    outputEl.classList.add("crossfade-out");
+
+    setTimeout(() => {
+      outputEl.textContent = newValue;
+      outputEl.classList.remove("crossfade-out");
+      if (callback) callback();
+    }, 180);
+  }
+
+  /**
+   * Play regenerate animation on button
+   * @param {HTMLElement} btn - Regenerate button
+   */
+  function playRegenerateAnimation(btn) {
+    if (prefersReducedMotion()) return;
+    btn.classList.add("regenerating");
+    setTimeout(() => btn.classList.remove("regenerating"), 400);
+  }
+
+  /**
+   * Animate panel transition (mode switch)
+   * @param {HTMLElement} hidePanel - Panel to hide
+   * @param {HTMLElement} showPanel - Panel to show
+   */
+  function animatePanelSwitch(hidePanel, showPanel) {
+    if (prefersReducedMotion()) {
+      hidePanel.hidden = true;
+      hidePanel.setAttribute("aria-hidden", "true");
+      showPanel.hidden = false;
+      showPanel.removeAttribute("aria-hidden");
+      return;
+    }
+
+    // Hide current panel
+    hidePanel.hidden = true;
+    hidePanel.setAttribute("aria-hidden", "true");
+
+    // Show new panel with animation
+    showPanel.hidden = false;
+    showPanel.removeAttribute("aria-hidden");
+    showPanel.classList.add("panel-enter");
+
+    // Trigger reflow
+    void showPanel.offsetWidth;
+
+    // Animate in
+    showPanel.classList.add("panel-enter-active");
+    showPanel.classList.remove("panel-enter");
+
+    setTimeout(() => {
+      showPanel.classList.remove("panel-enter-active");
+    }, 280);
+  }
+
+  /**
+   * Animate strength label change with brief crossfade
+   * @param {HTMLElement} labelEl - Strength label element
+   * @param {string} newLabel - New label text
+   * @param {string} newClass - New class name
+   */
+  function animateStrengthLabel(labelEl, newLabel, newClass) {
+    const oldLabel = labelEl.textContent;
+    const oldClass = labelEl.className;
+
+    if (oldLabel === newLabel && oldClass.includes(newClass)) return;
+
+    if (prefersReducedMotion()) {
+      labelEl.textContent = newLabel;
+      labelEl.className = "strength-label " + newClass;
+      return;
+    }
+
+    labelEl.classList.add("label-updating");
+
+    setTimeout(() => {
+      labelEl.textContent = newLabel;
+      labelEl.className = "strength-label " + newClass;
+    }, 100);
+  }
+
+  /**
+   * Add value change pulse to input
+   * @param {HTMLInputElement} input - Input element
+   */
+  function pulseInput(input) {
+    if (prefersReducedMotion()) return;
+    input.classList.remove("value-changed");
+    void input.offsetWidth;
+    input.classList.add("value-changed");
+    setTimeout(() => input.classList.remove("value-changed"), 180);
+  }
 
   // ========================================================================
   // WORD LIST FOR PASSPHRASES
@@ -2226,6 +2427,9 @@
   // DOM ELEMENTS
   // ========================================================================
   let elements = {};
+
+  // Track previous strength for animation
+  let previousStrength = null;
 
   // ========================================================================
   // APPLICATION STATE
