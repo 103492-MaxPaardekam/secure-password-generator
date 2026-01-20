@@ -180,10 +180,6 @@ Contributions are welcome! Please ensure:
 - Test with reduced motion enabled
 - Verify CSP compatibility
 
-## License
-
-MIT License — feel free to use, modify, and distribute.
-
 ---
 
 **Remember:** The strongest password is useless if reused. Use a password manager and never reuse passwords across accounts.
