@@ -548,7 +548,43 @@ body {
 }
 
 /* ========================================================================
-   Error Display
+   Toast Notification — Animated feedback pill
+   ======================================================================== */
+.toast {
+  position: fixed;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    transform var(--dur-2) var(--ease-out),
+    visibility var(--dur-2);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast.toast-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.toast-success {
+  background: var(--color-success);
+  color: white;
+}
+
+/* ========================================================================
+   Error Display — Animated validation feedback
    ======================================================================== */
 .error-display {
   background: rgba(255, 59, 48, 0.1);
@@ -559,23 +595,68 @@ body {
   color: var(--color-error);
   font-size: 0.875rem;
   text-align: center;
+  opacity: 0;
+  transform: translateY(-8px);
+  animation: error-slide-in var(--dur-3) var(--ease-out) forwards;
 }
 
 .error-display[hidden] {
   display: none;
 }
 
+@keyframes error-slide-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shake animation for error states */
+.shake {
+  animation: shake-error var(--dur-3) var(--ease-out);
+}
+
+@keyframes shake-error {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
 /* ========================================================================
-   Controls Panel
+   Panels Wrapper — Smooth mode transitions
+   ======================================================================== */
+.panels-wrapper {
+  position: relative;
+}
+
+/* ========================================================================
+   Controls Panel — Animated mode switching
    ======================================================================== */
 .controls-panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    transform var(--dur-3) var(--ease-out);
 }
 
 .controls-panel[hidden] {
   display: none;
+}
+
+.controls-panel.panel-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.controls-panel.panel-enter-active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ========================================================================
