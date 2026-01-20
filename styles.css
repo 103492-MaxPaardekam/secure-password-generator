@@ -316,7 +316,7 @@ body {
 }
 
 /* ========================================================================
-   Output Section
+   Output Section — Premium copy interactions
    ======================================================================== */
 .output-section {
   margin-bottom: var(--space-lg);
@@ -334,11 +334,14 @@ body {
   justify-content: center;
   cursor: pointer;
   transition:
-    border-color var(--transition-fast),
-    background-color var(--transition-fast),
-    transform var(--transition-fast);
+    border-color var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out),
+    transform var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out);
   user-select: all;
   -webkit-user-select: all;
+  overflow: hidden;
+  will-change: transform;
 }
 
 .output-container:hover {
@@ -346,19 +349,64 @@ body {
   background: var(--color-accent-soft);
 }
 
-.output-container:active {
-  transform: scale(0.99);
+.output-container:active,
+.output-container.tap-active {
+  transform: scale(0.985);
 }
 
 .output-container:focus-visible {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 4px var(--color-accent-soft);
+  box-shadow: var(--shadow-focus-ring);
 }
 
 .output-container.copied {
   border-color: var(--color-success);
   background: rgba(52, 199, 89, 0.1);
+}
+
+/* Success sheen effect — CSS-only highlight sweep */
+.output-sheen {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.output-container.sheen-active .output-sheen {
+  animation: sheen-sweep var(--dur-4) var(--ease-out) forwards;
+}
+
+@keyframes sheen-sweep {
+  0% {
+    left: -100%;
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .output-sheen {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 100%
+    );
+  }
 }
 
 .output {
@@ -370,6 +418,11 @@ body {
   text-align: center;
   line-height: 1.4;
   padding-right: var(--space-md);
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+
+.output.crossfade-out {
+  opacity: 0;
 }
 
 .output.passphrase-output {
@@ -383,7 +436,9 @@ body {
   right: var(--space-sm);
   font-size: 0.75rem;
   color: var(--color-text-tertiary);
-  transition: opacity var(--transition-fast);
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    color var(--dur-2) var(--ease-out);
 }
 
 .output-container:hover .copy-hint {
@@ -404,8 +459,8 @@ body {
   opacity: 0;
   transform: translateY(4px);
   transition:
-    opacity var(--transition-fast),
-    transform var(--transition-fast);
+    opacity var(--dur-2) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
 }
 
 .output-container.copied .copied-feedback {
@@ -435,35 +490,56 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition:
-    background-color var(--transition-fast),
-    transform var(--transition-fast);
+    background-color var(--dur-2) var(--ease-out),
+    transform var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out);
+  will-change: transform;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .btn-regenerate:hover:not(:disabled) {
   background: var(--color-accent-hover);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+  transform: translateY(-1px);
 }
 
-.btn-regenerate:active:not(:disabled) {
-  transform: scale(0.97);
+.btn-regenerate:active:not(:disabled),
+.btn-regenerate.press-active:not(:disabled) {
+  transform: scale(0.97) translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.2);
 }
 
 .btn-regenerate:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+  box-shadow: var(--shadow-focus-ring);
 }
 
 .btn-regenerate:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  transition: opacity var(--dur-3) var(--ease-out);
 }
 
 .icon-refresh {
   fill: currentColor;
-  transition: transform var(--transition-normal);
+  transition: transform var(--dur-3) var(--ease-out);
 }
 
 .btn-regenerate:hover:not(:disabled) .icon-refresh {
   transform: rotate(45deg);
+}
+
+.btn-regenerate.regenerating .icon-refresh {
+  animation: spin-refresh var(--dur-4) var(--ease-out);
+}
+
+@keyframes spin-refresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 }
 
 .shortcut-hint {
