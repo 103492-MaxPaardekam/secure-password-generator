@@ -537,9 +537,12 @@ body {
 }
 
 @keyframes spin-refresh {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .shortcut-hint {
@@ -617,11 +620,22 @@ body {
 }
 
 @keyframes shake-error {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-3px); }
-  80% { transform: translateX(3px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
 }
 
 /* ========================================================================
@@ -757,7 +771,7 @@ body {
   font-weight: 500;
   text-align: center;
   color: var(--color-text-primary);
-  transition: 
+  transition:
     border-color var(--dur-2) var(--ease-out),
     box-shadow var(--dur-2) var(--ease-out),
     transform var(--dur-1) var(--ease-out);
@@ -779,9 +793,15 @@ body {
 }
 
 @keyframes value-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ========================================================================
@@ -846,7 +866,8 @@ body {
 }
 
 .toggle-item input:checked + .toggle-switch:active::after {
-  transform: translateX(calc(var(--toggle-width) - var(--toggle-height))) scaleX(1.1);
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-height)))
+    scaleX(1.1);
 }
 
 .toggle-item input:focus-visible + .toggle-switch {
