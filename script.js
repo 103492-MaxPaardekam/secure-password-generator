@@ -3011,11 +3011,17 @@
   }
 
   /**
-   * Shows the "Copied" feedback on the output container.
+   * Shows the "Copied" feedback on the output container with animations.
    */
   function showCopiedFeedback() {
     elements.outputContainer.classList.add("copied");
     elements.liveRegion.textContent = "Copied to clipboard";
+
+    // Play sheen effect
+    playSheen(elements.outputContainer);
+
+    // Show toast
+    showToast("Copied to clipboard", "success", 1500);
 
     setTimeout(() => {
       elements.outputContainer.classList.remove("copied");
@@ -3030,6 +3036,9 @@
       return;
     }
 
+    // Play tap animation
+    playTap(elements.outputContainer);
+
     const success = await copyToClipboard(state.currentOutput);
 
     if (success) {
@@ -3037,15 +3046,18 @@
     } else {
       elements.liveRegion.textContent =
         "Failed to copy. Please select and copy manually.";
+      showToast("Failed to copy", "", 2000);
     }
   }
 
   /**
-   * Switches between password and passphrase modes.
+   * Switches between password and passphrase modes with animations.
    *
    * @param {string} mode - 'password' or 'passphrase'
    */
   function switchMode(mode) {
+    if (state.mode === mode) return; // Already in this mode
+
     state.mode = mode;
 
     // Update tabs
@@ -3054,9 +3066,12 @@
     elements.passwordTab.classList.toggle("active", mode === "password");
     elements.passphraseTab.classList.toggle("active", mode === "passphrase");
 
-    // Update panels
-    elements.passwordPanel.hidden = mode !== "password";
-    elements.passphrasePanel.hidden = mode !== "passphrase";
+    // Animate panel transition
+    const hidePanel =
+      mode === "password" ? elements.passphrasePanel : elements.passwordPanel;
+    const showPanel =
+      mode === "password" ? elements.passwordPanel : elements.passphrasePanel;
+    animatePanelSwitch(hidePanel, showPanel);
 
     // Update toggle indicator
     elements.modeToggle.setAttribute("data-mode", mode);
@@ -3067,8 +3082,8 @@
       `Generated ${mode}. Click to copy.`,
     );
 
-    // Generate new output
-    generate();
+    // Generate new output with animation
+    generate(true);
   }
 
   /**
@@ -3114,11 +3129,12 @@
 
   /**
    * Main render function - reads state and regenerates.
+   * @param {boolean} isRegenerate - Whether this is a regenerate action
    */
-  function render() {
+  function render(isRegenerate = false) {
     readStateFromUI();
     updateConditionalUI();
-    generate();
+    generate(isRegenerate);
   }
 
   // ========================================================================
@@ -3143,14 +3159,21 @@
       }
     });
 
-    // Regenerate button
-    elements.btnRegenerate.addEventListener("click", generate);
+    // Regenerate button with animation
+    elements.btnRegenerate.addEventListener("pointerdown", () => {
+      playPress(elements.btnRegenerate);
+    });
+    elements.btnRegenerate.addEventListener("click", () => {
+      playRegenerateAnimation(elements.btnRegenerate);
+      generate(true);
+    });
 
     // Keyboard shortcut (Ctrl/Cmd + Enter)
     document.addEventListener("keydown", (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
-        generate();
+        playRegenerateAnimation(elements.btnRegenerate);
+        generate(true);
       }
     });
 
@@ -3158,8 +3181,11 @@
     syncControls(elements.passwordLengthSlider, elements.passwordLengthInput);
     syncControls(elements.passphraseWordsSlider, elements.passphraseWordsInput);
 
-    // Password controls
-    elements.passwordLengthSlider.addEventListener("input", render);
+    // Password controls with animations
+    elements.passwordLengthSlider.addEventListener("input", () => {
+      pulseInput(elements.passwordLengthInput);
+      render();
+    });
     elements.passwordLengthInput.addEventListener("input", render);
     elements.optLowercase.addEventListener("change", render);
     elements.optUppercase.addEventListener("change", render);
@@ -3168,8 +3194,11 @@
     elements.symbolsInput.addEventListener("input", render);
     elements.optAmbiguous.addEventListener("change", render);
 
-    // Passphrase controls
-    elements.passphraseWordsSlider.addEventListener("input", render);
+    // Passphrase controls with animations
+    elements.passphraseWordsSlider.addEventListener("input", () => {
+      pulseInput(elements.passphraseWordsInput);
+      render();
+    });
     elements.passphraseWordsInput.addEventListener("input", render);
     elements.separatorSelect.addEventListener("change", () => {
       updateConditionalUI();
@@ -3180,6 +3209,24 @@
     elements.optAddNumber.addEventListener("change", render);
     elements.optAddSymbol.addEventListener("change", render);
     elements.passphraseSymbolsInput.addEventListener("input", render);
+
+    // Touch feedback for mobile
+    document.querySelectorAll(".mode-btn, .toggle-item").forEach((el) => {
+      el.addEventListener(
+        "touchstart",
+        () => {
+          el.style.opacity = "0.7";
+        },
+        { passive: true },
+      );
+      el.addEventListener(
+        "touchend",
+        () => {
+          el.style.opacity = "";
+        },
+        { passive: true },
+      );
+    });
   }
 
   // ========================================================================
