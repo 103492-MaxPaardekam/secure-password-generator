@@ -3,10 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
-    />
+    <!--
+      Content Security Policy:
+      - 'self' doesn't work reliably with file:// URLs in most browsers
+      - For local file access, we omit the CSP meta tag
+      - When deployed to a web server, uncomment and use this CSP:
+      <meta http-equiv="Content-Security-Policy" 
+            content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'">
+    -->
     <title>Keysmith — Secure Password & Passphrase Generator</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -340,6 +344,6 @@
       </footer>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
   </body>
 </html>

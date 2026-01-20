@@ -2225,50 +2225,7 @@
   // ========================================================================
   // DOM ELEMENTS
   // ========================================================================
-  const elements = {
-    // Mode toggle
-    modeToggle: document.querySelector(".mode-toggle"),
-    passwordTab: document.getElementById("tab-password"),
-    passphraseTab: document.getElementById("tab-passphrase"),
-    passwordPanel: document.getElementById("panel-password"),
-    passphrasePanel: document.getElementById("panel-passphrase"),
-
-    // Output
-    outputContainer: document.getElementById("output-container"),
-    output: document.getElementById("output"),
-    btnRegenerate: document.getElementById("btn-regenerate"),
-    liveRegion: document.getElementById("live-region"),
-    errorDisplay: document.getElementById("error-display"),
-
-    // Password controls
-    passwordLengthSlider: document.getElementById("password-length-slider"),
-    passwordLengthInput: document.getElementById("password-length-input"),
-    optLowercase: document.getElementById("opt-lowercase"),
-    optUppercase: document.getElementById("opt-uppercase"),
-    optDigits: document.getElementById("opt-digits"),
-    optSymbols: document.getElementById("opt-symbols"),
-    symbolsConfig: document.getElementById("symbols-config"),
-    symbolsInput: document.getElementById("symbols-input"),
-    optAmbiguous: document.getElementById("opt-ambiguous"),
-
-    // Passphrase controls
-    passphraseWordsSlider: document.getElementById("passphrase-words-slider"),
-    passphraseWordsInput: document.getElementById("passphrase-words-input"),
-    separatorSelect: document.getElementById("separator-select"),
-    customSeparator: document.getElementById("custom-separator"),
-    capitalizationSelect: document.getElementById("capitalization-select"),
-    optAddNumber: document.getElementById("opt-add-number"),
-    optAddSymbol: document.getElementById("opt-add-symbol"),
-    passphraseSymbolsConfig: document.getElementById(
-      "passphrase-symbols-config",
-    ),
-    passphraseSymbolsInput: document.getElementById("passphrase-symbols-input"),
-
-    // Strength panel
-    strengthBar: document.getElementById("strength-bar"),
-    strengthLabel: document.getElementById("strength-label"),
-    strengthBits: document.getElementById("strength-bits"),
-  };
+  let elements = {};
 
   // ========================================================================
   // APPLICATION STATE
@@ -3002,6 +2959,54 @@
       );
       return;
     }
+
+    // Initialize DOM element references
+    elements = {
+      // Mode toggle
+      modeToggle: document.querySelector(".mode-toggle"),
+      passwordTab: document.getElementById("tab-password"),
+      passphraseTab: document.getElementById("tab-passphrase"),
+      passwordPanel: document.getElementById("panel-password"),
+      passphrasePanel: document.getElementById("panel-passphrase"),
+
+      // Output
+      outputContainer: document.getElementById("output-container"),
+      output: document.getElementById("output"),
+      btnRegenerate: document.getElementById("btn-regenerate"),
+      liveRegion: document.getElementById("live-region"),
+      errorDisplay: document.getElementById("error-display"),
+
+      // Password controls
+      passwordLengthSlider: document.getElementById("password-length-slider"),
+      passwordLengthInput: document.getElementById("password-length-input"),
+      optLowercase: document.getElementById("opt-lowercase"),
+      optUppercase: document.getElementById("opt-uppercase"),
+      optDigits: document.getElementById("opt-digits"),
+      optSymbols: document.getElementById("opt-symbols"),
+      symbolsConfig: document.getElementById("symbols-config"),
+      symbolsInput: document.getElementById("symbols-input"),
+      optAmbiguous: document.getElementById("opt-ambiguous"),
+
+      // Passphrase controls
+      passphraseWordsSlider: document.getElementById("passphrase-words-slider"),
+      passphraseWordsInput: document.getElementById("passphrase-words-input"),
+      separatorSelect: document.getElementById("separator-select"),
+      customSeparator: document.getElementById("custom-separator"),
+      capitalizationSelect: document.getElementById("capitalization-select"),
+      optAddNumber: document.getElementById("opt-add-number"),
+      optAddSymbol: document.getElementById("opt-add-symbol"),
+      passphraseSymbolsConfig: document.getElementById(
+        "passphrase-symbols-config",
+      ),
+      passphraseSymbolsInput: document.getElementById(
+        "passphrase-symbols-input",
+      ),
+
+      // Strength panel
+      strengthBar: document.getElementById("strength-bar"),
+      strengthLabel: document.getElementById("strength-label"),
+      strengthBits: document.getElementById("strength-bits"),
+    };
 
     initEventListeners();
 
