@@ -1,49 +1,84 @@
-# Keysmith
+# Keysmith Vault
 
-**Secure Password & Passphrase Generator**
+**Secure Local-First Password Manager**
 
-A privacy-first, offline password generator with a premium Apple-like interface. No tracking, no network requests, no storage—just cryptographically secure passwords generated entirely in your browser.
+A privacy-first, offline password manager with a premium Apple-like interface. Zero-knowledge encryption, no tracking, no network requests—your passwords stay on your device, encrypted with military-grade AES-256-GCM.
 
 ## Features
 
 ### 🔐 Security First
 
-- **Web Crypto API** — All randomness comes from `crypto.getRandomValues()`, not `Math.random()`
-- **Unbiased Sampling** — Rejection sampling eliminates modulo bias for uniform distribution
+- **PBKDF2 + AES-256-GCM** — Industry-standard encryption with 600,000 iterations
+- **Web Crypto API** — All randomness from `crypto.getRandomValues()`, not `Math.random()`
+- **Zero-Knowledge** — Your master password never stored; decryption happens client-side
 - **No Network** — Works completely offline; no data ever leaves your device
-- **No Storage** — Nothing saved to localStorage, cookies, or any persistent storage
 - **CSP Ready** — Strict Content Security Policy compatible (no inline scripts)
+- **Local Breach Check** — Embedded common password list for offline security audits
 
-### 🔑 Password Mode
+### 🗄️ Multi-Vault Support
 
-- Configurable length (8–128 characters)
-- Character type toggles: lowercase, uppercase, digits, symbols
-- Custom symbol set support
-- Option to avoid ambiguous characters (O/0, I/l/1, etc.)
+- Create multiple vaults for work, personal, family
+- Each vault independently encrypted with its own master password
+- IndexedDB storage with automatic migration support
 
-### 📝 Passphrase Mode
+### 📋 Entry Templates
 
-- 3–10 word passphrases from a curated 1,500+ word list
-- Multiple separators: hyphen, space, underscore, dot, or custom
-- Capitalization options: lowercase, Title Case, rAnDoM cAsE
-- Optional number and symbol suffixes
+- **Login** — Username, password, URL, TOTP secret, notes
+- **Secure Note** — Encrypted text notes
+- **Wi-Fi** — Network name, password, security type
+- **Identity** — Name, email, phone, address
+- **Payment Card** — Card number, expiry, CVV, PIN
 
-### 📊 Strength Meter
+### 🔑 Password Generator
 
-- Real-time entropy calculation in bits
-- Visual strength indicator (Weak → Very Strong)
-- Educational breakdown of what entropy means
+- Configurable length (8–64 characters)
+- Character type toggles: uppercase, lowercase, digits, symbols
+- Passphrase mode with 3–10 words
+- Multiple separators: hyphen, underscore, dot, space
+- Real-time entropy calculation
 
-### ✨ Premium Micro-Interactions
+### 🛡️ Security Audit
 
-- Apple-like animation system with consistent motion tokens
-- Smooth transitions for all state changes
-- Tactile button press and tap feedback
-- Toast notifications for copy confirmation
-- Sheen effect on successful copy
-- Animated panel transitions between modes
-- Spring-physics toggle switches
+- **Weak passwords** — Below configurable entropy threshold
+- **Reused passwords** — Same password across entries
+- **Old passwords** — Exceed configurable age limit
+- **Common passwords** — Match known breached passwords
+
+### ⏱️ TOTP (2FA) Generator
+
+- RFC 6238 compliant implementation
+- Base32 secret decoding
+- Live 6-digit code generation with countdown timer
+- Copy codes with one click
+
+### 📦 Import/Export
+
+- Export encrypted vault backups (JSON)
+- Import from backup files
+- Emergency Kit generator (printable recovery info)
+- Backup reminders after 30 days
+
+### ⌨️ Power User Features
+
+- **Command Palette** (⌘K) — Quick access to all commands
+- **Keyboard Shortcuts** — Navigate with 1-4, search with /, new with N
+- **Favorites & Tags** — Organize and filter entries
+- **Password History** — Track up to 10 previous passwords per entry
+- **Custom Fields** — Add arbitrary label/value pairs
+
+### ✨ Premium Design
+
+- Apple-like interface with smooth animations
+- Light/Dark/System theme with 6 accent colors
+- Two-pane layout on desktop, mobile-optimized
 - Respects `prefers-reduced-motion` for accessibility
+- PWA installable for native-like experience
+
+### 🔒 Session Safety
+
+- Lock on tab blur (optional)
+- Inactivity auto-lock (1/5/15 minutes)
+- Clipboard auto-clear after 30 seconds
 
 ## Quick Start
 

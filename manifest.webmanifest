@@ -1,0 +1,45 @@
+{
+  "name": "Keysmith Vault",
+  "short_name": "Keysmith",
+  "description": "Secure local-first password manager with encrypted vault storage",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1C1C1E",
+  "theme_color": "#007AFF",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["security", "utilities", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "New Entry",
+      "short_name": "New",
+      "description": "Create a new password entry",
+      "url": "/index.html?action=new",
+      "icons": [{ "src": "icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Generator",
+      "short_name": "Generate",
+      "description": "Open password generator",
+      "url": "/index.html?tab=generator",
+      "icons": [{ "src": "icons/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}

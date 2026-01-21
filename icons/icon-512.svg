@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="keyGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#007AFF"/>
+      <stop offset="100%" style="stop-color:#5856D6"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34C759"/>
+      <stop offset="100%" style="stop-color:#30D158"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="102" fill="#1C1C1E"/>
+  <!-- Subtle grid pattern -->
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+    <path d="M32 0H0V32" fill="none" stroke="#2C2C2E" stroke-width="0.5"/>
+  </pattern>
+  <rect width="512" height="512" rx="102" fill="url(#grid)" opacity="0.3"/>
+  <!-- Shield shape -->
+  <path d="M256 64C256 64 144 96 144 96C144 96 128 102 128 134C128 214 144 326 256 410C368 326 384 214 384 134C384 102 368 96 368 96C368 96 256 64 256 64Z" fill="url(#shieldGrad512)" opacity="0.12"/>
+  <path d="M256 88C256 88 160 116 160 116C160 116 148 120 148 148C148 218 162 314 256 388C350 314 364 218 364 148C364 120 352 116 352 116C352 116 256 88 256 88Z" stroke="url(#shieldGrad512)" stroke-width="8" fill="none" filter="url(#glow)"/>
+  <!-- Key icon -->
+  <g transform="translate(256, 224)">
+    <circle cx="0" cy="-32" r="44" stroke="url(#keyGrad512)" stroke-width="12" fill="none" filter="url(#glow)"/>
+    <rect x="-8" y="12" width="16" height="88" rx="8" fill="url(#keyGrad512)"/>
+    <rect x="8" y="52" width="32" height="14" rx="6" fill="url(#keyGrad512)"/>
+    <rect x="8" y="74" width="22" height="14" rx="6" fill="url(#keyGrad512)"/>
+  </g>
+  <!-- Sparkle accents -->
+  <circle cx="124" cy="148" r="8" fill="#FFD60A" opacity="0.9"/>
+  <circle cx="388" cy="180" r="5" fill="#FF9F0A" opacity="0.7"/>
+  <circle cx="140" cy="340" r="4" fill="#5AC8FA" opacity="0.5"/>
+  <circle cx="372" cy="320" r="6" fill="#BF5AF2" opacity="0.6"/>
+  <!-- Version badge -->
+  <rect x="362" y="410" width="90" height="36" rx="18" fill="#007AFF"/>
+  <text x="407" y="434" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="600" fill="white" text-anchor="middle">v1.0</text>
+</svg>

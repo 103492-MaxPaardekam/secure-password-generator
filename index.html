@@ -2,362 +2,1427 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!--
-      Content Security Policy:
-      - 'self' doesn't work reliably with file:// URLs in most browsers
-      - For local file access, we omit the CSP meta tag
-      - When deployed to a web server, uncomment and use this CSP:
-      <meta http-equiv="Content-Security-Policy" 
-            content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'">
-    -->
-    <title>Keysmith — Secure Password & Passphrase Generator</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#007AFF" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta
+      name="description"
+      content="Keysmith Vault - Secure local-first password manager"
+    />
+    <title>Keysmith Vault</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/icon-192.svg" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <main class="app">
-      <header class="header">
-        <h1 class="logo">Keysmith</h1>
-        <p class="tagline">
-          Secure passwords and passphrases—generated locally.
-        </p>
-      </header>
-
-      <section class="card" aria-labelledby="generator-title">
-        <h2 id="generator-title" class="visually-hidden">Password Generator</h2>
-
-        <!-- Mode Toggle -->
-        <div class="mode-toggle" role="tablist" aria-label="Generator mode">
-          <button
-            role="tab"
-            id="tab-password"
-            aria-selected="true"
-            aria-controls="panel-password"
-            class="mode-btn active"
-            data-mode="password"
-          >
-            Password
-          </button>
-          <button
-            role="tab"
-            id="tab-passphrase"
-            aria-selected="false"
-            aria-controls="panel-passphrase"
-            class="mode-btn"
-            data-mode="passphrase"
-          >
-            Passphrase
-          </button>
-          <div class="mode-indicator" aria-hidden="true"></div>
-        </div>
-
-        <!-- Output Area -->
-        <div class="output-section">
-          <div
-            class="output-container"
-            role="button"
-            tabindex="0"
-            aria-label="Generated password. Click to copy."
-            id="output-container"
-          >
-            <div class="output-sheen" aria-hidden="true"></div>
-            <output id="output" class="output" aria-live="polite"></output>
-            <span class="copy-hint">Click to copy</span>
-            <span class="copied-feedback" aria-hidden="true">Copied!</span>
-          </div>
-          <div class="output-actions">
-            <button
-              type="button"
-              class="btn-regenerate"
-              id="btn-regenerate"
-              aria-label="Generate new password (Ctrl+Enter or Cmd+Enter)"
-            >
-              <svg
-                class="icon-refresh"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                aria-hidden="true"
-              >
+  <body data-theme="system" data-accent="blue">
+    <div id="app" class="app">
+      <!-- Onboarding Overlay -->
+      <div id="onboarding" class="onboarding" hidden>
+        <div class="onboarding-card">
+          <div class="onboarding-step active" data-step="1">
+            <div class="onboarding-icon">
+              <svg viewBox="0 0 48 48" width="64" height="64">
                 <path
-                  d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                  d="M24 4L8 12v12c0 11.1 6.84 21.48 16 24 9.16-2.52 16-12.9 16-24V12L24 4z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                />
+                <circle
+                  cx="24"
+                  cy="22"
+                  r="6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                />
+                <path
+                  d="M24 28v10M20 34h8"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
                 />
               </svg>
-              Regenerate
+            </div>
+            <h2>Welcome to Keysmith Vault</h2>
+            <p>
+              Your passwords are encrypted locally using military-grade
+              AES-256-GCM encryption. Nothing is ever sent to any server.
+            </p>
+            <div class="onboarding-badge">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
+                  fill="currentColor"
+                /></svg
+              >Zero-knowledge encryption
+            </div>
+          </div>
+          <div class="onboarding-step" data-step="2">
+            <div class="onboarding-icon">
+              <svg viewBox="0 0 48 48" width="64" height="64">
+                <rect
+                  x="8"
+                  y="16"
+                  width="32"
+                  height="24"
+                  rx="3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                />
+                <path
+                  d="M16 16V12a8 8 0 1116 0v4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                />
+                <path
+                  d="M18 28h12M18 34h8"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <h2>Backup Your Vault</h2>
+            <p>
+              Since everything is stored locally, regular backups are essential.
+              Export your encrypted vault periodically to keep your data safe.
+            </p>
+            <div class="onboarding-badge warning">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+                  fill="currentColor"
+                /></svg
+              >No cloud — you control your data
+            </div>
+          </div>
+          <div class="onboarding-step" data-step="3">
+            <div class="onboarding-icon">
+              <svg viewBox="0 0 48 48" width="64" height="64">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                />
+                <path
+                  d="M24 14v10l7 7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+                <circle cx="24" cy="24" r="3" fill="currentColor" />
+              </svg>
+            </div>
+            <h2>Generator & Audit</h2>
+            <p>
+              Generate strong passwords and passphrases. The built-in security
+              audit helps identify weak, reused, or old passwords.
+            </p>
+            <div class="onboarding-badge success">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                  fill="currentColor"
+                /></svg
+              >Stay secure with audits
+            </div>
+          </div>
+          <div class="onboarding-nav">
+            <div class="onboarding-dots">
+              <button class="dot active" data-step="1"></button
+              ><button class="dot" data-step="2"></button
+              ><button class="dot" data-step="3"></button>
+            </div>
+            <div class="onboarding-actions">
+              <button id="btn-skip-onboarding" class="btn-text">Skip</button
+              ><button id="btn-next-onboarding" class="btn-primary">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vault Selection Screen -->
+      <div id="vault-select" class="screen vault-select">
+        <header class="screen-header">
+          <div class="logo">
+            <svg viewBox="0 0 48 48" width="48" height="48">
+              <path
+                d="M24 4L8 12v12c0 11.1 6.84 21.48 16 24 9.16-2.52 16-12.9 16-24V12L24 4z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              />
+              <circle
+                cx="24"
+                cy="22"
+                r="6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              />
+              <path
+                d="M24 28v10M20 34h8M20 38h4"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+            </svg>
+            <h1>Keysmith <span>Vault</span></h1>
+          </div>
+          <p class="tagline">Secure local-first password manager</p>
+        </header>
+        <div class="vault-list-section">
+          <h2 class="section-title">Your Vaults</h2>
+          <div id="vault-list" class="vault-list"></div>
+          <button id="btn-create-vault" class="btn-create">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                fill="currentColor"
+              /></svg
+            >Create New Vault
+          </button>
+        </div>
+        <footer class="screen-footer">
+          <button id="btn-import-vault" class="btn-link">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
+                fill="currentColor"
+              /></svg
+            >Import Vault
+          </button>
+          <button id="btn-about-main" class="btn-link">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                fill="currentColor"
+              /></svg
+            >About &amp; Security
+          </button>
+        </footer>
+      </div>
+
+      <!-- Unlock Screen -->
+      <div id="unlock-screen" class="screen unlock-screen" hidden>
+        <button id="btn-back-vaults" class="btn-back">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path
+              d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <div class="unlock-card">
+          <div class="vault-icon" id="unlock-icon">
+            <svg viewBox="0 0 24 24" width="32" height="32">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <h2 id="unlock-name">Personal Vault</h2>
+          <p class="unlock-desc">Enter your master password to unlock</p>
+          <form id="unlock-form" class="unlock-form">
+            <div class="form-field">
+              <div class="password-wrapper">
+                <input
+                  type="password"
+                  id="master-password"
+                  class="text-input"
+                  placeholder="Master Password"
+                  autocomplete="current-password"
+                  required
+                /><button type="button" class="btn-toggle-vis">
+                  <svg
+                    class="eye-open"
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                  >
+                    <path
+                      d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                      fill="currentColor"
+                    /></svg
+                  ><svg
+                    class="eye-closed"
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    hidden
+                  >
+                    <path
+                      d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 001 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="unlock-error" class="form-error" hidden></div>
+            <button type="submit" id="btn-unlock" class="btn-primary btn-full">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"
+                  fill="currentColor"
+                /></svg
+              >Unlock
             </button>
-            <span class="shortcut-hint" aria-hidden="true">⌘/Ctrl + Enter</span>
+          </form>
+          <button id="btn-vault-options" class="btn-text">
+            Vault Settings
+          </button>
+        </div>
+        <div class="unlock-loader" hidden>
+          <div class="loader-spinner"></div>
+          <span>Decrypting...</span>
+        </div>
+      </div>
+
+      <!-- Main App -->
+      <div id="main-app" class="main-app" hidden>
+        <!-- Backup Banner -->
+        <div id="backup-banner" class="backup-banner" hidden>
+          <div class="banner-text">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L18 9l-9 9z"
+                fill="currentColor"
+              /></svg
+            ><span
+              >Backup recommended — it's been a while since your last
+              export</span
+            >
+          </div>
+          <div class="banner-actions">
+            <button id="btn-export-now" class="btn-small">Export Now</button
+            ><button id="btn-dismiss-banner" class="btn-icon-sm">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
           </div>
         </div>
 
-        <!-- Toast notification -->
-        <div
-          id="toast"
-          class="toast"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        ></div>
+        <!-- App Header -->
+        <header class="app-header">
+          <div class="header-left">
+            <button id="btn-mobile-menu" class="btn-icon mobile-only">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path
+                  d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <h1 id="vault-title" class="vault-title">Personal Vault</h1>
+          </div>
+          <div class="header-right">
+            <button id="btn-cmd" class="btn-icon" title="Command Palette (⌘K)">
+              <svg viewBox="0 0 24 24" width="22" height="22">
+                <path
+                  d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                  fill="currentColor"
+                />
+              </svg></button
+            ><button id="btn-lock" class="btn-icon" title="Lock Vault">
+              <svg viewBox="0 0 24 24" width="22" height="22">
+                <path
+                  d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
+        </header>
 
-        <!-- Live region for screen reader announcements -->
-        <div
-          id="live-region"
-          class="visually-hidden"
-          aria-live="polite"
-          aria-atomic="true"
-        ></div>
-
-        <!-- Error display -->
-        <div
-          id="error-display"
-          class="error-display"
-          role="alert"
-          aria-live="assertive"
-          hidden
-        ></div>
-
-        <!-- Panels wrapper for smooth transitions -->
-        <div class="panels-wrapper">
-          <!-- Password Controls -->
-          <div
-            role="tabpanel"
-            id="panel-password"
-            aria-labelledby="tab-password"
-            class="controls-panel"
+        <!-- Navigation -->
+        <nav class="main-nav" role="tablist">
+          <button
+            role="tab"
+            id="nav-vault"
+            class="nav-btn active"
+            aria-selected="true"
           >
-            <fieldset class="control-group">
-              <legend>Length</legend>
-              <div class="slider-group">
-                <input
-                  type="range"
-                  id="password-length-slider"
-                  min="8"
-                  max="128"
-                  value="16"
-                  aria-label="Password length slider"
-                />
-                <input
-                  type="number"
-                  id="password-length-input"
-                  min="8"
-                  max="128"
-                  value="16"
-                  aria-label="Password length"
-                  class="length-input"
-                />
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                fill="currentColor"
+              /></svg
+            ><span>Vault</span>
+          </button>
+          <button
+            role="tab"
+            id="nav-generator"
+            class="nav-btn"
+            aria-selected="false"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                fill="currentColor"
+              /></svg
+            ><span>Generator</span>
+          </button>
+          <button
+            role="tab"
+            id="nav-audit"
+            class="nav-btn"
+            aria-selected="false"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"
+                fill="currentColor"
+              /></svg
+            ><span>Audit</span
+            ><span id="audit-badge" class="badge" hidden>0</span>
+          </button>
+          <button
+            role="tab"
+            id="nav-settings"
+            class="nav-btn"
+            aria-selected="false"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                fill="currentColor"
+              /></svg
+            ><span>Settings</span>
+          </button>
+          <div class="nav-indicator"></div>
+        </nav>
+
+        <!-- Content -->
+        <div class="content-area">
+          <!-- Vault View -->
+          <div id="view-vault" class="view active">
+            <div class="two-pane">
+              <div class="list-pane">
+                <div class="filter-bar">
+                  <div class="search-box">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                      <path
+                        d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                        fill="currentColor"
+                      /></svg
+                    ><input
+                      type="search"
+                      id="search-input"
+                      class="search-input"
+                      placeholder="Search... ( / )"
+                    /><kbd class="kbd">/</kbd>
+                  </div>
+                  <div class="filter-btns">
+                    <button
+                      id="btn-filter-fav"
+                      class="btn-filter"
+                      title="Favorites"
+                    >
+                      <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path
+                          d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                          fill="currentColor"
+                        />
+                      </svg></button
+                    ><button
+                      id="btn-filter-tags"
+                      class="btn-filter"
+                      title="Tags"
+                    >
+                      <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path
+                          d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div id="active-filters" class="active-filters" hidden></div>
+                <div id="entry-list" class="entry-list" role="listbox"></div>
+                <div id="empty-state" class="empty-state" hidden>
+                  <div class="empty-icon">
+                    <svg viewBox="0 0 80 80" width="80" height="80">
+                      <rect
+                        x="20"
+                        y="25"
+                        width="40"
+                        height="35"
+                        rx="4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        opacity="0.3"
+                      />
+                      <circle
+                        cx="40"
+                        cy="38"
+                        r="6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        opacity="0.3"
+                      />
+                      <path
+                        d="M40 44v8"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        opacity="0.3"
+                      />
+                    </svg>
+                  </div>
+                  <h3>Your vault is empty</h3>
+                  <p>Add your first entry to get started</p>
+                  <button id="btn-empty-add" class="btn-primary">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                      <path
+                        d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                        fill="currentColor"
+                      /></svg
+                    >Add Entry
+                  </button>
+                </div>
+                <button id="btn-add-entry" class="fab">
+                  <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path
+                      d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
               </div>
-            </fieldset>
-
-            <fieldset class="control-group">
-              <legend>Character Types</legend>
-              <div class="toggle-grid">
-                <label class="toggle-item">
-                  <input type="checkbox" id="opt-lowercase" checked />
-                  <span class="toggle-switch"></span>
-                  <span class="toggle-label">Lowercase (a-z)</span>
-                </label>
-                <label class="toggle-item">
-                  <input type="checkbox" id="opt-uppercase" checked />
-                  <span class="toggle-switch"></span>
-                  <span class="toggle-label">Uppercase (A-Z)</span>
-                </label>
-                <label class="toggle-item">
-                  <input type="checkbox" id="opt-digits" checked />
-                  <span class="toggle-switch"></span>
-                  <span class="toggle-label">Digits (0-9)</span>
-                </label>
-                <label class="toggle-item">
-                  <input type="checkbox" id="opt-symbols" />
-                  <span class="toggle-switch"></span>
-                  <span class="toggle-label">Symbols</span>
-                </label>
+              <div class="detail-pane" id="detail-pane">
+                <div class="detail-empty">
+                  <svg viewBox="0 0 24 24" width="48" height="48" opacity="0.3">
+                    <path
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L18 9l-9 9z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <p>Select an entry to view details</p>
+                </div>
+                <div id="detail-content" class="detail-content" hidden></div>
               </div>
-            </fieldset>
-
-            <fieldset
-              class="control-group symbols-config"
-              id="symbols-config"
-              hidden
-            >
-              <legend>Allowed Symbols</legend>
-              <input
-                type="text"
-                id="symbols-input"
-                class="text-input"
-                value="!@#$%^&*()-_=+[]{};:,.<>?"
-                aria-describedby="symbols-help"
-              />
-              <small id="symbols-help" class="help-text"
-                >Tip: remove characters you don't want included.</small
-              >
-            </fieldset>
-
-            <fieldset class="control-group">
-              <legend>Options</legend>
-              <label class="toggle-item">
-                <input type="checkbox" id="opt-ambiguous" checked />
-                <span class="toggle-switch"></span>
-                <span class="toggle-label">Avoid ambiguous characters</span>
-              </label>
-              <small class="help-text">Excludes: O, 0, I, l, 1, |, etc.</small>
-            </fieldset>
+            </div>
           </div>
 
-          <!-- Passphrase Controls -->
-          <div
-            role="tabpanel"
-            id="panel-passphrase"
-            aria-labelledby="tab-passphrase"
-            class="controls-panel"
-            hidden
-            aria-hidden="true"
-          >
-            <fieldset class="control-group">
-              <legend>Number of Words</legend>
-              <div class="slider-group">
-                <input
-                  type="range"
-                  id="passphrase-words-slider"
-                  min="3"
-                  max="10"
-                  value="4"
-                  aria-label="Number of words slider"
-                />
-                <input
-                  type="number"
-                  id="passphrase-words-input"
-                  min="3"
-                  max="10"
-                  value="4"
-                  aria-label="Number of words"
-                  class="length-input"
-                />
-              </div>
-            </fieldset>
+          <!-- Generator View -->
+          <div id="view-generator" class="view" hidden>
+            <div class="generator-standalone">
+              <div id="generator-mount"></div>
+            </div>
+          </div>
 
-            <fieldset class="control-group">
-              <legend>Separator</legend>
-              <div class="separator-controls">
-                <select
-                  id="separator-select"
-                  class="select-input"
-                  aria-label="Word separator"
+          <!-- Audit View -->
+          <div id="view-audit" class="view" hidden>
+            <div class="audit-container">
+              <div class="audit-summary">
+                <div class="audit-card weak">
+                  <div class="audit-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L18 9l-9 9z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                  <div class="audit-info">
+                    <span class="audit-count" id="count-weak">0</span
+                    ><span class="audit-label">Weak</span>
+                  </div>
+                </div>
+                <div class="audit-card reused">
+                  <div class="audit-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path
+                        d="M16.24 7.76A5.974 5.974 0 0012 6v6l-4.24 4.24c2.34 2.34 6.14 2.34 8.49 0a5.99 5.99 0 00-.01-8.48zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                  <div class="audit-info">
+                    <span class="audit-count" id="count-reused">0</span
+                    ><span class="audit-label">Reused</span>
+                  </div>
+                </div>
+                <div class="audit-card old">
+                  <div class="audit-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path
+                        d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                  <div class="audit-info">
+                    <span class="audit-count" id="count-old">0</span
+                    ><span class="audit-label">Old</span>
+                  </div>
+                </div>
+                <div class="audit-card breach">
+                  <div class="audit-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path
+                        d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                  <div class="audit-info">
+                    <span class="audit-count" id="count-breach">0</span
+                    ><span class="audit-label">Common</span>
+                  </div>
+                </div>
+              </div>
+              <div class="audit-actions">
+                <button id="btn-run-audit" class="btn-secondary">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                      d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                      fill="currentColor"
+                    /></svg
+                  >Run Audit</button
+                ><button
+                  id="btn-audit-settings"
+                  class="btn-icon"
+                  title="Audit Settings"
                 >
-                  <option value="-" selected>Hyphen (-)</option>
-                  <option value=" ">Space</option>
-                  <option value="_">Underscore (_)</option>
-                  <option value=".">Dot (.)</option>
-                  <option value="custom">Custom...</option>
-                </select>
-                <input
-                  type="text"
-                  id="custom-separator"
-                  class="text-input separator-input"
-                  maxlength="3"
-                  placeholder="e.g. ~"
-                  aria-label="Custom separator"
-                  hidden
-                />
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path
+                      d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
               </div>
-            </fieldset>
-
-            <fieldset class="control-group">
-              <legend>Capitalization</legend>
-              <select
-                id="capitalization-select"
-                class="select-input"
-                aria-label="Word capitalization"
-              >
-                <option value="lowercase" selected>lowercase</option>
-                <option value="capitalize">Capitalize Each Word</option>
-                <option value="random">rAnDoM cAsE</option>
-              </select>
-            </fieldset>
-
-            <fieldset class="control-group">
-              <legend>Optional Additions</legend>
-              <div class="toggle-grid">
-                <label class="toggle-item">
-                  <input type="checkbox" id="opt-add-number" />
-                  <span class="toggle-switch"></span>
-                  <span class="toggle-label">Add a number (2-3 digits)</span>
-                </label>
-                <label class="toggle-item">
-                  <input type="checkbox" id="opt-add-symbol" />
-                  <span class="toggle-switch"></span>
-                  <span class="toggle-label">Add a symbol</span>
-                </label>
+              <div id="audit-results" class="audit-results">
+                <div class="audit-empty">
+                  <svg viewBox="0 0 24 24" width="48" height="48" opacity="0.3">
+                    <path
+                      d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <p>Run an audit to check your passwords</p>
+                </div>
               </div>
-            </fieldset>
+            </div>
+          </div>
 
-            <fieldset
-              class="control-group passphrase-symbols-config"
-              id="passphrase-symbols-config"
-              hidden
-            >
-              <legend>Symbol to Add From</legend>
-              <input
-                type="text"
-                id="passphrase-symbols-input"
-                class="text-input"
-                value="!@#$%^&*"
-                aria-describedby="passphrase-symbols-help"
-              />
-              <small id="passphrase-symbols-help" class="help-text"
-                >One random symbol from this set will be appended.</small
-              >
-            </fieldset>
+          <!-- Settings View -->
+          <div id="view-settings" class="view" hidden>
+            <div class="settings-container">
+              <section class="settings-section">
+                <h3>Appearance</h3>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Theme</span
+                    ><span class="setting-desc">Choose color scheme</span>
+                  </div>
+                  <select id="set-theme" class="select-sm">
+                    <option value="system">System</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Accent Color</span
+                    ><span class="setting-desc">Customize accent</span>
+                  </div>
+                  <div class="color-picker" id="accent-picker">
+                    <button
+                      class="color-opt active"
+                      data-color="blue"
+                      style="--c: #007aff"
+                    ></button
+                    ><button
+                      class="color-opt"
+                      data-color="purple"
+                      style="--c: #5856d6"
+                    ></button
+                    ><button
+                      class="color-opt"
+                      data-color="pink"
+                      style="--c: #ff2d55"
+                    ></button
+                    ><button
+                      class="color-opt"
+                      data-color="orange"
+                      style="--c: #ff9500"
+                    ></button
+                    ><button
+                      class="color-opt"
+                      data-color="green"
+                      style="--c: #34c759"
+                    ></button
+                    ><button
+                      class="color-opt"
+                      data-color="teal"
+                      style="--c: #5ac8fa"
+                    ></button>
+                  </div>
+                </div>
+              </section>
+              <section class="settings-section">
+                <h3>Security</h3>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Lock on Tab Blur</span
+                    ><span class="setting-desc">Lock when switching tabs</span>
+                  </div>
+                  <label class="toggle"
+                    ><input type="checkbox" id="set-lock-blur" /><span
+                      class="toggle-track"
+                    ></span
+                  ></label>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Inactivity Lock</span
+                    ><span class="setting-desc">Lock after inactivity</span>
+                  </div>
+                  <select id="set-inactivity" class="select-sm">
+                    <option value="0">Disabled</option>
+                    <option value="60">1 minute</option>
+                    <option value="300">5 minutes</option>
+                    <option value="900">15 minutes</option>
+                  </select>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Clear Clipboard</span
+                    ><span class="setting-desc">Clear after 30 seconds</span>
+                  </div>
+                  <label class="toggle"
+                    ><input type="checkbox" id="set-clipboard" /><span
+                      class="toggle-track"
+                    ></span
+                  ></label>
+                </div>
+              </section>
+              <section class="settings-section">
+                <h3>Data</h3>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Export Vault</span
+                    ><span class="setting-desc">Download encrypted backup</span>
+                  </div>
+                  <button id="btn-export" class="btn-secondary">Export</button>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info">
+                    <span class="setting-label">Emergency Kit</span
+                    ><span class="setting-desc">Printable recovery info</span>
+                  </div>
+                  <button id="btn-emergency" class="btn-secondary">
+                    Generate
+                  </button>
+                </div>
+              </section>
+              <section class="settings-section">
+                <h3>About</h3>
+                <button id="btn-shortcuts" class="setting-row clickable">
+                  <div class="setting-info">
+                    <span class="setting-label">Keyboard Shortcuts</span
+                    ><span class="setting-desc">View all shortcuts</span>
+                  </div>
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path
+                      d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+                <button id="btn-about" class="setting-row clickable">
+                  <div class="setting-info">
+                    <span class="setting-label">Security &amp; Privacy</span
+                    ><span class="setting-desc">Learn about encryption</span>
+                  </div>
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path
+                      d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+                <div class="app-version">
+                  Keysmith Vault v1.0.0<span>Local-first • Zero-knowledge</span>
+                </div>
+              </section>
+            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Strength Panel -->
-        <section class="strength-panel" aria-labelledby="strength-title">
-          <h3 id="strength-title" class="strength-title">Strength</h3>
-          <div class="strength-display">
-            <div class="strength-meter">
-              <div class="strength-bar" id="strength-bar"></div>
+      <!-- Modals -->
+      <!-- Entry Modal -->
+      <div id="entry-modal" class="modal-backdrop" hidden>
+        <div class="modal modal-lg">
+          <header class="modal-header">
+            <h2 id="entry-modal-title">Add Entry</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <form id="entry-form">
+              <div class="form-field">
+                <label for="entry-type">Type</label
+                ><select id="entry-type" class="select-input">
+                  <option value="login">Login</option>
+                  <option value="note">Secure Note</option>
+                  <option value="wifi">Wi-Fi</option>
+                  <option value="identity">Identity</option>
+                  <option value="card">Payment Card</option>
+                </select>
+              </div>
+              <div id="entry-fields"></div>
+              <div class="form-field">
+                <label>Tags</label>
+                <div class="tags-wrap">
+                  <div id="entry-tags-list" class="tags-list"></div>
+                  <input
+                    type="text"
+                    id="entry-tags-input"
+                    class="text-input tags-input"
+                    placeholder="Add tag..."
+                  />
+                </div>
+              </div>
+              <details class="form-section">
+                <summary>Custom Fields</summary>
+                <div id="custom-fields"></div>
+                <button type="button" id="btn-add-field" class="btn-link">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                      d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                      fill="currentColor"
+                    /></svg
+                  >Add Field
+                </button>
+              </details>
+              <details id="history-section" class="form-section" hidden>
+                <summary>Password History</summary>
+                <div id="password-history"></div>
+              </details>
+              <div id="entry-error" class="form-error" hidden></div>
+            </form>
+          </div>
+          <footer class="modal-footer">
+            <button
+              type="button"
+              id="btn-delete-entry"
+              class="btn-danger"
+              hidden
+            >
+              Delete
+            </button>
+            <div class="modal-footer-right">
+              <button type="button" class="btn-secondary modal-cancel">
+                Cancel</button
+              ><button
+                type="submit"
+                form="entry-form"
+                id="btn-save-entry"
+                class="btn-primary"
+              >
+                Save
+              </button>
             </div>
-            <div class="strength-info">
-              <span class="strength-label" id="strength-label">Strong</span>
-              <span class="strength-bits" id="strength-bits">77.5 bits</span>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Generator Modal -->
+      <div id="gen-modal" class="modal-backdrop" hidden>
+        <div class="modal modal-gen">
+          <header class="modal-header">
+            <h2>Generate Password</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body"><div id="modal-gen-mount"></div></div>
+          <footer class="modal-footer">
+            <button type="button" class="btn-secondary modal-cancel">
+              Cancel</button
+            ><button type="button" id="btn-use-gen" class="btn-primary">
+              Use Password
+            </button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Vault Modal -->
+      <div id="vault-modal" class="modal-backdrop" hidden>
+        <div class="modal">
+          <header class="modal-header">
+            <h2 id="vault-modal-title">Create Vault</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <form id="vault-form">
+              <div class="form-field">
+                <label for="vault-name">Vault Name</label
+                ><input
+                  type="text"
+                  id="vault-name"
+                  class="text-input"
+                  placeholder="e.g., Personal"
+                  required
+                />
+              </div>
+              <div class="form-field" id="vault-pw-field">
+                <label for="vault-pw">Master Password</label>
+                <div class="password-wrapper">
+                  <input
+                    type="password"
+                    id="vault-pw"
+                    class="text-input"
+                    placeholder="Create strong password"
+                    autocomplete="new-password"
+                    required
+                  /><button type="button" class="btn-toggle-vis">
+                    <svg
+                      class="eye-open"
+                      viewBox="0 0 24 24"
+                      width="20"
+                      height="20"
+                    >
+                      <path
+                        d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                        fill="currentColor"
+                      /></svg
+                    ><svg
+                      class="eye-closed"
+                      viewBox="0 0 24 24"
+                      width="20"
+                      height="20"
+                      hidden
+                    >
+                      <path
+                        d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 001 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="pw-strength">
+                  <div id="vault-pw-bar" class="pw-bar"></div>
+                </div>
+              </div>
+              <div class="form-field" id="vault-confirm-field">
+                <label for="vault-confirm">Confirm Password</label
+                ><input
+                  type="password"
+                  id="vault-confirm"
+                  class="text-input"
+                  placeholder="Confirm password"
+                  autocomplete="new-password"
+                  required
+                />
+              </div>
+              <div id="vault-error" class="form-error" hidden></div>
+            </form>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" class="btn-secondary modal-cancel">
+              Cancel</button
+            ><button
+              type="submit"
+              form="vault-form"
+              id="btn-save-vault"
+              class="btn-primary"
+            >
+              Create
+            </button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Delete Vault Modal -->
+      <div id="delete-vault-modal" class="modal-backdrop" hidden>
+        <div class="modal modal-sm">
+          <header class="modal-header"><h2>Delete Vault</h2></header>
+          <div class="modal-body">
+            <p>
+              Permanently delete "<span id="del-vault-name"></span>" and all
+              entries? This cannot be undone.
+            </p>
+            <div class="form-field">
+              <label>Type <strong>DELETE</strong> to confirm</label
+              ><input
+                type="text"
+                id="del-confirm"
+                class="text-input"
+                placeholder="DELETE"
+                autocomplete="off"
+              />
             </div>
           </div>
-          <details class="strength-details">
-            <summary>What this means</summary>
-            <div class="details-content">
-              <p>
-                <strong>Entropy</strong> estimates how hard a password is to
-                guess via brute force. Higher is better.
-              </p>
-              <ul>
-                <li><strong>&lt;50 bits:</strong> Weak — easily cracked</li>
-                <li>
-                  <strong>50–80 bits:</strong> Okay — fine for low-value
-                  accounts
-                </li>
-                <li>
-                  <strong>80–110 bits:</strong> Strong — good for most uses
-                </li>
-                <li>
-                  <strong>&gt;110 bits:</strong> Very Strong — excellent
-                  security
-                </li>
-              </ul>
-              <p>
-                <em>Remember:</em> Password reuse is the biggest risk. Use a
-                password manager and never reuse passwords.
-              </p>
+          <footer class="modal-footer">
+            <button type="button" class="btn-secondary modal-cancel">
+              Cancel</button
+            ><button
+              type="button"
+              id="btn-del-vault"
+              class="btn-danger"
+              disabled
+            >
+              Delete Vault
+            </button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Delete Entry Modal -->
+      <div id="delete-entry-modal" class="modal-backdrop" hidden>
+        <div class="modal modal-sm">
+          <header class="modal-header"><h2>Delete Entry</h2></header>
+          <div class="modal-body">
+            <p>
+              Delete "<span id="del-entry-name"></span>"? This cannot be undone.
+            </p>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" class="btn-secondary modal-cancel">
+              Cancel</button
+            ><button type="button" id="btn-del-entry" class="btn-danger">
+              Delete
+            </button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Command Palette -->
+      <div id="cmd-palette" class="cmd-backdrop" hidden>
+        <div class="cmd-palette">
+          <div class="cmd-search">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                fill="currentColor"
+              /></svg
+            ><input
+              type="text"
+              id="cmd-input"
+              placeholder="Search commands or entries..."
+              autocomplete="off"
+            /><kbd>esc</kbd>
+          </div>
+          <div id="cmd-results" class="cmd-results"></div>
+        </div>
+      </div>
+
+      <!-- Shortcuts Modal -->
+      <div id="shortcuts-modal" class="modal-backdrop" hidden>
+        <div class="modal">
+          <header class="modal-header">
+            <h2>Keyboard Shortcuts</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body shortcuts-grid">
+            <div class="shortcut-section">
+              <h4>General</h4>
+              <div class="shortcut">
+                <span>Command Palette</span><kbd>⌘</kbd><kbd>K</kbd>
+              </div>
+              <div class="shortcut"><span>Search</span><kbd>/</kbd></div>
+              <div class="shortcut">
+                <span>Lock Vault</span><kbd>⌘</kbd><kbd>L</kbd>
+              </div>
+              <div class="shortcut"><span>Close Modal</span><kbd>Esc</kbd></div>
             </div>
-          </details>
-        </section>
-      </section>
+            <div class="shortcut-section">
+              <h4>Navigation</h4>
+              <div class="shortcut"><span>Vault Tab</span><kbd>1</kbd></div>
+              <div class="shortcut"><span>Generator Tab</span><kbd>2</kbd></div>
+              <div class="shortcut"><span>Audit Tab</span><kbd>3</kbd></div>
+              <div class="shortcut"><span>Settings Tab</span><kbd>4</kbd></div>
+            </div>
+            <div class="shortcut-section">
+              <h4>Entries</h4>
+              <div class="shortcut"><span>New Entry</span><kbd>N</kbd></div>
+              <div class="shortcut"><span>Edit Entry</span><kbd>E</kbd></div>
+              <div class="shortcut">
+                <span>Navigate</span><kbd>↑</kbd><kbd>↓</kbd>
+              </div>
+              <div class="shortcut"><span>Open</span><kbd>Enter</kbd></div>
+            </div>
+            <div class="shortcut-section">
+              <h4>Generator</h4>
+              <div class="shortcut">
+                <span>Regenerate</span><kbd>⌘</kbd><kbd>↵</kbd>
+              </div>
+              <div class="shortcut">
+                <span>Copy</span><kbd>⌘</kbd><kbd>C</kbd>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <footer class="footer">
-        <p class="trust-note">
-          No network, no storage, no tracking. Randomness via Web Crypto.
-        </p>
-      </footer>
-    </main>
+      <!-- About Modal -->
+      <div id="about-modal" class="modal-backdrop" hidden>
+        <div class="modal modal-lg">
+          <header class="modal-header">
+            <h2>About &amp; Security</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body about-body">
+            <section>
+              <h3>Encryption</h3>
+              <p>Keysmith uses industry-standard encryption:</p>
+              <ul>
+                <li>
+                  <strong>PBKDF2</strong> with 600,000 iterations for key
+                  derivation
+                </li>
+                <li><strong>AES-256-GCM</strong> authenticated encryption</li>
+                <li><strong>Web Crypto API</strong> for secure randomness</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Local-First Storage</h3>
+              <p>Your data never leaves your device:</p>
+              <ul>
+                <li>All data stored in <strong>IndexedDB</strong></li>
+                <li><strong>No network requests</strong> — ever</li>
+                <li><strong>No analytics or tracking</strong></li>
+                <li>Works offline as a PWA</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Limitations</h3>
+              <ul>
+                <li>
+                  <strong>Clipboard</strong>: Cannot guarantee clearing on all
+                  browsers
+                </li>
+                <li>
+                  <strong>Memory</strong>: Decrypted data in memory while
+                  unlocked
+                </li>
+                <li><strong>Backups</strong>: You must backup your vault</li>
+                <li><strong>Lost Password</strong>: Cannot be recovered</li>
+              </ul>
+            </section>
+            <section>
+              <h3>Recommendations</h3>
+              <ul>
+                <li>Use a strong, memorable master password</li>
+                <li>Export backups regularly</li>
+                <li>Store backups in multiple locations</li>
+                <li>Run security audits periodically</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </div>
 
-    <script src="script.js" defer></script>
+      <!-- Audit Settings Modal -->
+      <div id="audit-modal" class="modal-backdrop" hidden>
+        <div class="modal">
+          <header class="modal-header">
+            <h2>Audit Settings</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <div class="form-field">
+              <label for="audit-entropy">Min Strength (bits)</label
+              ><input
+                type="number"
+                id="audit-entropy"
+                class="text-input"
+                value="50"
+                min="20"
+                max="128"
+              /><span class="form-hint">Below this = weak</span>
+            </div>
+            <div class="form-field">
+              <label for="audit-age">Max Age (days)</label
+              ><input
+                type="number"
+                id="audit-age"
+                class="text-input"
+                value="365"
+                min="30"
+                max="1095"
+              /><span class="form-hint">Older = flagged</span>
+            </div>
+            <div class="form-field">
+              <label for="audit-words">Min Passphrase Words</label
+              ><input
+                type="number"
+                id="audit-words"
+                class="text-input"
+                value="4"
+                min="3"
+                max="12"
+              /><span class="form-hint">Fewer = flagged</span>
+            </div>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" class="btn-secondary modal-cancel">
+              Cancel</button
+            ><button type="button" id="btn-save-audit" class="btn-primary">
+              Save
+            </button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Emergency Kit Modal -->
+      <div id="emergency-modal" class="modal-backdrop" hidden>
+        <div class="modal">
+          <header class="modal-header">
+            <h2>Emergency Kit</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <p>
+              Generate a printable kit with recovery info.
+              <strong>Does not include passwords.</strong>
+            </p>
+            <div class="form-field">
+              <label for="emergency-hint">Password Hint (optional)</label
+              ><input
+                type="text"
+                id="emergency-hint"
+                class="text-input"
+                placeholder="A hint to remember..."
+              /><span class="form-hint">⚠️ Don't make it obvious</span>
+            </div>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" class="btn-secondary modal-cancel">
+              Cancel</button
+            ><button type="button" id="btn-gen-kit" class="btn-primary">
+              Generate
+            </button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- TOTP Modal -->
+      <div id="totp-modal" class="modal-backdrop" hidden>
+        <div class="modal modal-sm">
+          <header class="modal-header">
+            <h2>Two-Factor Code</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <div class="totp-display">
+              <div class="totp-code" id="totp-code">------</div>
+              <div class="totp-timer">
+                <svg class="totp-ring" viewBox="0 0 36 36">
+                  <circle class="ring-bg" cx="18" cy="18" r="16" />
+                  <circle
+                    class="ring-fg"
+                    id="totp-ring"
+                    cx="18"
+                    cy="18"
+                    r="16"
+                  /></svg
+                ><span id="totp-secs">30</span>
+              </div>
+            </div>
+            <button id="btn-copy-totp" class="btn-secondary btn-full">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                  fill="currentColor"
+                /></svg
+              >Copy Code
+            </button>
+            <p class="totp-warn">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                  fill="currentColor"
+                /></svg
+              >Codes generated locally. Treat TOTP secrets like passwords.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags Modal -->
+      <div id="tags-modal" class="modal-backdrop" hidden>
+        <div class="modal">
+          <header class="modal-header">
+            <h2>Filter by Tags</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <div id="all-tags" class="all-tags"></div>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" id="btn-clear-tags" class="btn-secondary">
+              Clear All</button
+            ><button type="button" class="btn-primary modal-close">Done</button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Vault Options Modal -->
+      <div id="vault-opts-modal" class="modal-backdrop" hidden>
+        <div class="modal">
+          <header class="modal-header">
+            <h2>Vault Settings</h2>
+            <button class="btn-icon modal-close">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </header>
+          <div class="modal-body">
+            <div class="form-field">
+              <label for="opt-vault-name">Vault Name</label
+              ><input type="text" id="opt-vault-name" class="text-input" />
+            </div>
+            <div class="vault-meta">
+              <span>Created: <span id="opt-created">—</span></span
+              ><span>Entries: <span id="opt-count">0</span></span>
+            </div>
+          </div>
+          <footer class="modal-footer">
+            <button type="button" id="btn-delete-vault" class="btn-danger">
+              Delete Vault
+            </button>
+            <div class="modal-footer-right">
+              <button type="button" class="btn-secondary modal-cancel">
+                Cancel</button
+              ><button type="button" id="btn-save-opts" class="btn-primary">
+                Save
+              </button>
+            </div>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div id="toast" class="toast" role="status" aria-live="polite">
+        <span class="toast-icon"></span><span class="toast-msg"></span>
+      </div>
+
+      <!-- Live Region -->
+      <div
+        id="live-region"
+        class="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
+
+      <!-- Install Prompt -->
+      <div id="install-prompt" class="install-prompt" hidden>
+        <div class="install-text">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path
+              d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
+              fill="currentColor"
+            /></svg
+          ><span>Install Keysmith for quick access</span>
+        </div>
+        <div class="install-btns">
+          <button id="btn-install" class="btn-small">Install</button
+          ><button id="btn-dismiss-install" class="btn-icon-sm">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
   </body>
 </html>
